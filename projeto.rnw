@@ -1,0 +1,195 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage{comment} % habilita el uso de comentarios en varias lineas (\ifx \fi) 
+\usepackage{lipsum} %Este paquete genera texto del tipo  Lorem Ipsum. 
+\usepackage{fullpage} % cambia el margen
+
+\usepackage{multicol}
+\usepackage{caption}
+\usepackage{mwe}
+\usepackage{adjustbox}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{soul}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{arydshln}
+\usepackage{cancel}
+\usepackage{bm}
+\usepackage{array}
+    
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+\definecolor{alizarin}{rgb}{0.82, 0.1, 0.26}
+\definecolor{shadecolor}{rgb}{1,.8,.3}
+\definecolor{almond}{rgb}{0.94, 0.87, 0.8}
+
+\newcommand*{\bigchi}{\mbox{\Large$\chi$}}
+
+\makeatletter
+\def\thickhline{%
+  \noalign{\ifnum0=`}\fi\hrule \@height \thickarrayrulewidth \futurelet
+   \reserved@a\@xthickhline}
+\def\@xthickhline{\ifx\reserved@a\thickhline
+               \vskip\doublerulesep
+               \vskip-\thickarrayrulewidth
+             \fi
+      \ifnum0=`{\fi}}
+\makeatother
+
+\newlength{\thickarrayrulewidth}
+\setlength{\thickarrayrulewidth}{4\arrayrulewidth}
+
+
+\newtheorem{theorem}{Proposition}
+
+
+\begin{document}
+
+\hspace*{-\parindent}%
+\begin{minipage}[t]{0.7\linewidth}
+\vspace{-0.8cm}
+\raggedright
+	%\noindent
+	\large\textbf{Project 2} \\
+	\textbf{Computational Numerical Statistics} \\
+	\normalsize DM, FCT-UNL \\
+	\textbf{2022-2023}\\
+	{\bf Group 6 : Afonso Ribeiro 59895, Francisco Freitas 60313,  Miguel Santos 64474 and Pedro Anjos 66519}
+\end{minipage}
+\begin{minipage}{0.3\linewidth}
+\raggedleft
+	\includegraphics[scale=0.12]{logo_nova-st_rgb_vert_positivo.png}
+\end{minipage}
+\\
+
+\par\noindent\rule{\textwidth}{0.4pt}
+
+
+\section{Introduction}
+
+\subsection{Jackknife method}
+The jackknife method is a resampling method with the goal of estimating the bias and standard error of estimators by systematically estimating $\theta$ using all the samples that can be obtained from the original observed sample by subtracting one sample value each time.\\ \\
+Let $X_1, . . . , X_n$ be a random sample from some population $X \sim F(\theta)$, with both $F$ and $\theta$ unknown. Let $T = g(X_1, . . . , X_n)$ be an estimator of $\theta$. \\
+Let $x_1, . . . , x_n$ be a realization of the random sample above and $t = g(x_1, . . . , x_n)$ an estimate of $\theta$.\\
+Let\\ 
+\centerline{
+$
+(x_2, x_3, \ldots, x_n), \:\: (x_1, x_3,\ldots, x_n)\:\:, \:\: \ldots \:\:, \:\:(x_1, \ldots, x_{n-1})
+$} \\
+be the $n$ jackknife samples (with size = ($n-1$)) and \\
+\centerline{
+$
+t^{\ast}_1 = g(x_2, x_3, \ldots , x_n),\:\: \ldots \:\:, \:\: t^{\ast}_n = g(x_1, \ldots, x_{n-1})
+$
+}
+be the $n$ jackknife estimates of $\theta$. \\
+Let $t_{jack} = \frac{1}{n}\sum_{i=1}^n t^{\ast}_i = \overline{t}^{\ast}$ (jackknife estimate of $\theta$)
+
+\section{Exercises}
+\subsection{Problem 1}
+When $T = \overline{X}$, show that: 
+\subsubsection{$T = T_{jack}$ }
+If $T = \overline{X}$ then $t = \overline{X}$ and \\
+\begin{align*}
+t^\ast_1 & = \frac{1}{n-1} (x_2 + \ldots + x_n) = \frac{1}{n-1} \sum^n_{i=1, i \neq 1}(x_i)\\
+t^\ast_2 & = \frac{1}{n-1} (x_1 + x_3 + \ldots + x_n) = \frac{1}{n-1} \sum^n_{i=1, i \neq 2}(x_i)\\
+\ldots \\
+t^\ast_n & = \frac{1}{n-1} (x_1 + \ldots + x_{n-1}) = \frac{1}{n-1} \sum^n_{i=1, i \neq n}(x_i)
+\end{align*}
+\\
+\textbf{Since} $T_{jack} =\frac{1}{n}\sum^n_{i=1}(t^\ast_i) = \overline{t^\ast}$, therefore \\
+\begin{align*}
+T_{jack} &= \frac{1}{n}\sum^n_{i=1}(t^\ast_i) = \frac{1}{n} \sum^n_{i=1}(\frac{1}{n-1} \sum^n_{j=1, j \neq i}(x_j))\\
+& = \frac{1}{n} \frac{1}{n-1} \sum^n_{i=1}(\sum^n_{j=1, j \neq i}(x_j))
+\end{align*}
+\textbf{Considering that} \\
+$\sum^n_{i=1}(c) = nc$ and $\sum^n_{i=1}(\sum^n_{j=1, j \neq i}(x_j)) = ((x_2+...+x_n)+ (x_1+x_3+ ...+x_n) + \ldots + (x_1+...+x_{n-1}))$ \\
+\textbf{thus} \\
+$\sum^n_{i=1}(\sum^n_{j=1, j \neq i}(x_j)) = (n-1)(x_1 + \ldots + x_n)$
+
+\begin{align*}
+T_{jack} &= \frac{1}{n} \frac{1}{n-1} \sum^n_{i=1}(\sum^n_{j=1, j \neq i}(x_j)) \\
+& = \frac{1}{n}\frac{1}{n-1}\sum^n_{i=1}(n-1)(x_1 + \ldots + x_n) \\
+\end{align*}
+\begin{align*}
+& = \frac{1}{n}(\frac{1}{\bcancel{(n-1)}}\bcancel{(n-1)}\sum^n_{i=1}(x_1 + \ldots + x_n) \\
+& = \frac{1}{n} (x_1+...+x_n) \\
+& = \overline{x} 
+\end{align*}
+Since $x_1, \ldots, x_n$ is a realization of $X_1, ..., X_n$ we can conclude that ${\bf T = T_{jack}}$
+
+\subsubsection{$V(T_{jack}) = \frac{n-1}{n} \sum_{i=1}^{n} (T_i^*-T_{jack})^2$ simplifies to $\frac{S^2}{n}=V(\overline{X})$}
+\begin{align*}
+    V(T_{jack}) & = \frac{n-1}{n} \sum_{i=1}^{n} (T_i^*-T_{jack})^2 \\
+    & = \frac{n-1}{n} ((\frac{1}{n-1}(x_2 + \ldots + x_n) - \overline{X})^2 + \ldots + (\frac{1}{n-1}(x_1 + \ldots + x_{n-1}) - \overline{X})^2) \\
+    & = \frac{n-1}{n} ((\frac{1}{n-1}((x_2 + \ldots + x_n) - (n-1) \overline{X}))^2 + \ldots + (\frac{1}{n-1}((x_1 + \ldots + x_{n-1}) - (n-1)\overline{X}))^2) \\
+    & = \frac{\bcancel{(n-1)}}{n} \frac{1}{(n-1)^{\bcancel{2}}}(((x_2 + \ldots + x_n) - (n-1) \overline{X})^2 + \ldots + ((x_1 + \ldots + x_{n-1}) - (n-1)\overline{X})^2) \\
+    & = \frac{1}{n(n-1)}(((x_2 + \ldots + x_n) - (n\overline{X} - \overline{X}))^2 + \ldots + ((x_1 + \ldots + x_{n-1}) - (n\overline{X} - \overline{X}))^2) \\
+    & = \frac{1}{n(n-1)}(((x_2 + \ldots + x_n) - n\overline{X} + \overline{X})^2 + \ldots + ((x_1 + \ldots + x_{n-1}) - n\overline{X} + \overline{X})^2)
+\end{align*}
+\pagebreak
+
+\begin{align*}
+& = \frac{1}{n(n-1)}(((x_2 + \ldots + x_n) - \bcancel{n}(\frac{1}{\bcancel{n}}\sum^n_{i=1}(x_i)) + \overline{X})^2 + \ldots + ((x_1 + \ldots + x_{n-1}) - \bcancel{n}(\frac{1}{\bcancel{n}}\sum^n_{i=1}(x_i)) + \overline{X})^2) \\
+& = \frac{1}{n(n-1)}(((x_2 + \ldots + x_n) - (x_1 + \ldots + x_n) + \overline{X})^2 + \ldots + ((x_1 + \ldots + x_{n-1}) - (x_1 + \ldots + x_n) + \overline{X})^2) \\
+& = \frac{1}{n(n-1)}((-x_1 + \overline{X})^2 + \ldots + (- x_n + \overline{X})^2) = \frac{1}{n(n-1)}((-(x_1 - \overline{X}))^2 + \ldots + (-(x_n - \overline{X}))^2) \\
+& = \frac{1}{n(n-1)}((-1)^2(x_1 - \overline{X})^2 + \ldots + (-1)^2(x_n - \overline{X})^2) = \frac{1}{n(n-1)}((x_1 - \overline{X})^2 + \ldots + (x_n - \overline{X})^2) \\
+& = \frac{1}{n(n-1)}\sum^n_{i=1}(x_i - \overline{X})^2 \\
+\end{align*}
+\textbf{Considering that} 
+$S^2 = (\sqrt{\frac{\sum^n_{i=1}(x_i - \overline{X})^2}{n-1}})^2 = \frac{\sum^n_{i=1}(x_i - \overline{X})^2}{n-1}$\textbf{, thus}
+\begin{align*}
+    V(T_{jack}) & = \frac{1}{n(n-1)}\sum^n_{i=1}(x_i - \overline{X})^2 \\
+    & = \frac{S^2}{n} = V(\overline{X})
+\end{align*}
+
+
+\subsection{Consider the observed sample referring to the survival times of some electrical component pertaining to a car assembly factory.}
+
+\begin{center}
+\begin{tabular}{c c c c c c c c c c}
+  $1552$ & $627$ & $884$ & $2183$ & $1354$ & $1354$ & $1014$ & $2420$ & $71$ & $3725$ \\
+  $2195$ & $2586$ & $1577$ & $1766$ & $1325$ & $1299$ & $159$ & $1825$ & $965$ & $695$ 
+\end{tabular}
+\end{center}
+
+\subsubsection{(e) Show that $\mathcal{P} = \frac{X}{n}$ is an unbiased and consistent estimator of p. Estimate p and SE(P).}
+\begin{center}
+  $E(\mathcal{P}) = E\left(\frac{X}{n}\right) = \frac{E(X)}{n}$
+\end{center}
+
+X has an Binomial distribution therefore its expected value is $np$. Proof:
+
+Knowing this:
+\begin{center}
+$\frac{E(X)}{n} = \frac{np}{n} = p $ 
+\end{center}
+
+since $E(\mathcal{P}) = p$ whe can afirm that $\mathcal{P}$ is an unbiased estimator.
+
+\[  \lim_{n\to\infty} V(\mathcal{P}) = \lim_{n\to\infty} V\left(\frac{X}{n}\right) = \lim_{n\to\infty} \frac{V(X)}{n^2}  = 0\]
+
+$\mathcal{P}$ is a consistent estimator since it's variance aproaches 0 as the sample size increases.
+
+
+\subsubsection{(f) Describe and discuss in detail the non-parametric bootstrap and jackknife techniques. Use both approaches (B = 10000 samples in the case of the bootstrap) to estimate the variance, standard error and bias of P. Compare the results. Check whether there is need to correct the original estimate of p for bias and if such report the corrected estimate of p.}
+
+Bootstaping is any resampling method that that uses random sampling with replacement for a given sample. It is used to assess the accuracy of statistical estimates and tests and estimate statistics of the population.
+
+The non-parametric does not make any assumptions about the distribution of the population. This makes it on average more robust to distributional assumptions unlike the parametric bootstrap. With this robustness comes a necessity for a larger sample size than what would be needed for a parametric bootstrap. If the sample size is too small the estimator it might not approximate the real value very well.
+
+The non parametric bootstrap works in the following way:
+
+1.
+
+bootstraping is really simple and easy to understand. It can be applied to on complex estimators to derive estimates for the standard error and confidence intervals. Bootstrapping also avoids the cost of gathering new sample data.
+
+Bootstaping is heavly dependent on the estimator. Using it without care can lead to inconsistent results. When using bootstrap, assumptions about the about the sample are made and it does not garantee that values are representitive of the general population. Bootstrapping can be time consuming and it's not easly automatable using statistical computer packages.
+
+\bibliographystyle{unsrt}
+\bibliography{bibs}
+\end{document}
