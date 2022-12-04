@@ -176,19 +176,78 @@ since $E(\mathcal{P}) = p$ whe can afirm that $\mathcal{P}$ is an unbiased estim
 $\mathcal{P}$ is a consistent estimator since it's variance aproaches 0 as the sample size increases.
 
 
-\subsubsection{(f) Describe and discuss in detail the non-parametric bootstrap and jackknife techniques. Use both approaches (B = 10000 samples in the case of the bootstrap) to estimate the variance, standard error and bias of P. Compare the results. Check whether there is need to correct the original estimate of p for bias and if such report the corrected estimate of p.}
+\subsubsection{(f) Describe and discuss in detail the non-parametric bootstrap and jackknife techniques. Use both approaches (B = 10000 samples in the case of the bootstrap) to estimate the variance, standard error and bias of $\mathcal{P}$. Compare the results. Check whether there is need to correct the original estimate of p for bias and if such report the corrected estimate of p.}
 
+\textbf{non-parametric bootstraping} \\
 Bootstaping is any resampling method that that uses random sampling with replacement for a given sample. It is used to assess the accuracy of statistical estimates and tests and estimate statistics of the population.
 
 The non-parametric does not make any assumptions about the distribution of the population. This makes it on average more robust to distributional assumptions unlike the parametric bootstrap. With this robustness comes a necessity for a larger sample size than what would be needed for a parametric bootstrap. If the sample size is too small the estimator it might not approximate the real value very well.
 
-The non parametric bootstrap works in the following way:
+Here is algorithm for the non-parametric bootstrap:
 
-1.
+\begin{center}
+  \begin{varwidth}{\textwidth}
+  \begin{itemize}
+  \item[step 1 -] choose the the amount of bootstrap samples to compute
+  \item[step 2 -] for each bootstrap sample
+    \begin{itemize}
+    \item[step 1 -] sample the population with replacement
+    \item[step 2 -] calculate the statistic you want to obtain
+    \end{itemize}
+  \item[step 3 -] calculate the mean of the the obtain bootstrap samples
+  \end{itemize}
+  \end{varwidth}
+\end{center}
 
-bootstraping is really simple and easy to understand. It can be applied to on complex estimators to derive estimates for the standard error and confidence intervals. Bootstrapping also avoids the cost of gathering new sample data.
+Bootstraping is really simple and easy to understand. It can be applied to complex estimators to derive estimates for the standard error and confidence intervals. Bootstrapping also avoids the cost of gathering new sample data.
 
-Bootstaping is heavly dependent on the estimator. Using it without care can lead to inconsistent results. When using bootstrap, assumptions about the about the sample are made and it does not garantee that values are representitive of the general population. Bootstrapping can be time consuming and it's not easly automatable using statistical computer packages.
+Bootstaping is heavly dependent on the estimator. Using it without care can lead to inconsistent results. When using bootstrap, assumptions about the about the sample are made and it does not garantee that values are representitive of the general population. Bootstrapping can be time consuming and it's not easly automatable using statistical computer packages.\\
+
+\textbf{jackknife} \\
+
+The jackknife is another resampling technique.It predates the bootstrap. It was created with the goal of estimating the bias and standard error estimators. The jackknife allows us to obtain samples similar to the original sample by leaving one sample value out at a time, unlike the bootstrap method.
+
+Here is the jackknife algorihtm:
+
+\begin{center}
+  \begin{varwidth}{\textwidth}
+    \begin{itemize}
+
+    \item Let $X_1 ,..., X_n$ be a random sample from some population $X \sim F (\theta$) with both $F$ and $\theta$ unknown. Let $T = g(X_1 ,..., X_n)$ be an estimator of $\theta$.
+
+    \item Let $x_1 ,..., x_n$ be a realization of the random sample above and $t = g(x_1 ,..., x_n )$ an estimate of $\theta$.
+
+    \item Let
+      \begin{center}
+        \begin{tabular}{c c c c}
+          $x_2 , x_3 ,..., x_n ,$ & $x_1 , x_3 ,..., x_n,$ & ... , & $x_1 ,..., x_{n−1}$
+        \end{tabular}
+
+      \end{center}
+      be the n jackknife samples (of size $(n - 1)$) and
+      \begin{center}
+        \begin{tabular}{c c c }
+          $t{_1^*} = g(x_2 , x_3 ,..., x_n ),$ &
+          ... , & 
+          $t{_n^*} = g(x_1 ,..., x_{n−1} )$ 
+        \end{tabular}
+      \end{center}
+      be the $n$ jackknife estimates of $\theta$
+
+    \item let $t_{jack} = \frac{1}{n} \sum_{i=1}^{n} t{_i^*} = \bar{t^*}$ (jacknife estimation of $\theta$)
+
+
+  \end{itemize}
+  \end{varwidth}
+\end{center}
+
+It is normally less computational itensive than the bootstrap method. like the bootstrap, it does not make any assumptions about the distribution of the sample. It is easier than the bootstrap to apply to complex sampling schemes than the bootstrap.
+
+Jackknife only works well for functoins with small changes in the statistic therefore it works well with, for example, linear statistics. May that not be the  case, it might fail to estimate the variance successfully. Compared to the boostrap, jackknife is only a crude approximation and therefore, if a more accurate value is desired, bootstrap confidence intervals are a better choice.
+
+
+
+
 
 \bibliographystyle{unsrt}
 \bibliography{bibs}
