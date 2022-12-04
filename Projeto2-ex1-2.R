@@ -1,8 +1,6 @@
 ## 1.2 TODO set.seed
-
 survivalTimes = c(1552, 627, 884, 2183, 1354, 1354, 1014, 2420,  71, 3725,
 	          2195, 2586, 1577, 1766, 1325, 1299, 159, 1825, 965, 695)
-
 B = 100000
 
 
@@ -23,19 +21,18 @@ sd0 = sd(survivalTimes)
 n = length(survivalTimes)
 
 t.obs = (mean(survivalTimes)-mu0)/(sd0/sqrt(n))
-t.star=numeric(B)
+t.star = numeric(B)
 
 z=survivalTimes-mean(survivalTimes)+mu0
 
 for(i in 1:B){
-    z.star    = sample(z,length(survivalTimes),replace=T)
+    z.star    = sample(z,n,replace=T)
     sd.z.star = sd(z.star)
     t.star[i] = (mean(z.star)-mu0)/(sd.z.star/sqrt(n))
 }
 
 # decision on H0 based on the p.value
-p.value <- sum(t.star>t.obs)/B ## TODO verificar se direção do teste está correta
-  p.value  
+p.value <- sum(t.star>t.obs)/B; p.value ## TODO verificar se direção do teste está correta
 
 ###(b)
 alpha = 0.1
@@ -71,7 +68,6 @@ boot.ci(boot.mean,type=c("basic","norm","perc"))
 
 P.mean = mean(survivalTimes > 1100); P.mean
 
-
 ## (f)
 
 ### bootstrap
@@ -80,11 +76,12 @@ t.star.boot=numeric(B)
 
 
 for(i in 1:B){
-    z.star    = sample(survivalTimes,length(survivalTimes),replace =T)
-    t.star.boot[i] = mean(z.star > 1100)
+    survivalTimes.sample = sample(survivalTimes,length(survivalTimes),replace =T)
+    t.star.boot[i] = mean(survivalTimes.sample > 1100)
 }
 
-t.star.boot.bias = mean(t.star.boot) - P.mean; t.star.boot.bias
+t.star.boot.mean =mean(t.star.boot)
+t.star.boot.bias = t.star.boot.mean - P.mean; t.star.boot.bias
 t.star.boot.var = var(t.star.boot); t.star.boot.var
 t.star.boot.sd = sqrt(t.star.boot.var); t.star.boot.sd
 
