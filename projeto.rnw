@@ -188,6 +188,19 @@ where $\Phi$ the standard normal cumulative distribution function and $z^{(i)}$ 
 
 X has an Binomial distribution therefore its expected value is $np$. Proof:
 
+
+\begin{align*}
+  \sum_{k=1}^{n} k \binom{n}{k} p^K (1-p)^{n-k} = \\
+  \sum_{k=1}^{n} k \frac{n!}{k!(n-k)!} p^k (1-p)^{n-k} = \\
+  \sum_{k=1}^{n} \frac{n!}{(k-1)!(n-k)!} p^k (1-p)^{n-k} = \\
+  np \sum_{k=1}^{n} \frac{(n-1)!}{(k-1)!(n-k)!} p^{k-1} (1-p)^{n-k} = \\
+  np \sum_{k=1}^{n} \binom{n-1}{k-1} p^{k-1} (1-p)^{n-k}
+\end{align*}
+
+through the binomial theorem we get:
+
+\[np(p + (1-p))^{n-1} = np * 1 = np\]
+
 Knowing this:
 \begin{center}
 $\frac{E(X)}{n} = \frac{np}{n} = p $ 
@@ -273,7 +286,9 @@ Jackknife only works well for functoins with small changes in the statistic ther
 
 \textbf{jackknife-after-bootstrap} \\
 
-Jackknife-after-boostrap is a method used to find the error estimate of a bootstrap estimate. After bootstrapping, we apply the jackknife to each of the newly generated samples. Here is the algorithm, after drawing the boostrap samples:
+Jackknife-after-boostrap is a method used to find the error estimate of a bootstrap estimate. It can be applied to any bootstrap statistic, not only standard error. After bootstrapping, we apply the jackknife to each of the newly generated samples. 
+
+Here is the algorithm for the calculating the variance statistic, after drawing the boostrap samples:
 
 \begin{itemize}
 \item For $i = 1,2, ..., n$, leave out the data in index i. call the result $\widehat{SE}_{B(i)}$
