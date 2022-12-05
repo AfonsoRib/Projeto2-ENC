@@ -1,10 +1,9 @@
-## 1.2 TODO set.seed
+## 1.2
 survivalTimes = c(1552, 627, 884, 2183, 1354, 1354, 1014, 2420,  71, 3725,
 	          2195, 2586, 1577, 1766, 1325, 1299, 159, 1825, 965, 695)
 B = 100000
 
 ###(a)
-
 mu0 = 1020
 sd0 = sd(survivalTimes)
 n = length(survivalTimes)
@@ -19,7 +18,7 @@ for(i in 1:B){
     t.star[i] = (mean(z.star)-mu0)/(sd.z.star/sqrt(n))
 }
 # decision on H0 based on the p.value
-p.value <- sum(t.star>t.obs)/B; p.value ## TODO verificar se direção do teste está correta
+p.value <- sum(t.star>t.obs)/B; p.value
 
 ###(b)
 set.seed(777)
@@ -38,32 +37,33 @@ ci.boot = t - c(d[2],d[1])
 names(ci.boot) <- c("5%", "95%")
 ci.boot
 
+library(ggplot2)
+p1 <- ggplot(data.frame(bootstrap = t.star), aes(x = bootstrap)) +
+      geom_histogram(aes(y = after_stat(density)))
+plot(p1)
+
 ## percentile 90% CI
 d = quantile(t.star, c(alpha/2,1-alpha/2)); d
 
 ##(c)
 set.seed(777)
-u <- c(alpha/2, 1-alpha/2) 
-z0 <- qnorm(mean(mean(t.star < t)))
-zu <- qnorm(u)
+u <- c(alpha/2, 1-alpha/2) #desired quantiles
+z <- qnorm(mean(t.star < t)) 
+z.u <- qnorm(u)
+
+## calculate accelaration using an estimator
 t.star.jack = numeric(length(survivalTimes))
 for(i in 1:length(survivalTimes)){
     t.star.jack[i] = mean(survivalTimes[-i])
 }
-
 mean.t.star.jack <- mean(t.star.jack)
-a.hat <- -sum((t.star.jack-mean.t.star.jack)^3)/(6*(sum((t.star.jack-mean.t.star.jack)^2))^(3/2))
-
-#Desired quantiles
-u <- c(alpha/2, 1-alpha/2) 
+a.hat <- sum((mean.t.star.jack - t.star.jack)^3)/(6*(sum((mean.t.star.jack - t.star.jack)^2))^(3/2))
 
 #Adjusted quantiles
-u_adjusted <- pnorm(z0 + (z0+zu)/(1-a.hat*(z0+zu))) 
+u_adjusted <- pnorm(z + (z+z.u)/(1-a.hat*(z+z.u))) 
 
 #Accelerated Bootstrap CI
 quantile(t.star, u_adjusted)
-
-
 
 ## (d)
 set.seed(777)
@@ -114,7 +114,7 @@ for(i in 1:B){
     t.star.boot[i] = mean(z.star > 1100)
 }
 for(i in 1:B){
-    t.star.jack[i] = sqrt(var(t.star.boot[-i]))
+    t.star.jack[i] = sd(t.star.boot[-i])
 }
 
 t.star.jack.var = mean((t.star.jack - mean(t.star.jack))^2) * (n-1); t.star.jack.var
