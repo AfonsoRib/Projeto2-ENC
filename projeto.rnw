@@ -68,29 +68,7 @@
 
 \par\noindent\rule{\textwidth}{0.4pt}
 
-
-\section{Introduction}
-
-\subsection{Jackknife method}
-The jackknife method is a resampling method with the goal of estimating the bias and standard error of estimators by systematically estimating $\theta$ using all the samples that can be obtained from the original observed sample by subtracting one sample value each time.\\ \\
-Let $X_1, . . . , X_n$ be a random sample from some population $X \sim F(\theta)$, with both $F$ and $\theta$ unknown. Let $T = g(X_1, . . . , X_n)$ be an estimator of $\theta$. \\
-Let $x_1, . . . , x_n$ be a realization of the random sample above and $t = g(x_1, . . . , x_n)$ an estimate of $\theta$.\\
-Let\\ 
-\centerline{
-$
-(x_2, x_3, \ldots, x_n), \:\: (x_1, x_3,\ldots, x_n)\:\:, \:\: \ldots \:\:, \:\:(x_1, \ldots, x_{n-1})
-$} \\
-be the $n$ jackknife samples (with size = ($n-1$)) and \\
-\centerline{
-$
-t^{\ast}_1 = g(x_2, x_3, \ldots , x_n),\:\: \ldots \:\:, \:\: t^{\ast}_n = g(x_1, \ldots, x_{n-1})
-$
-}
-be the $n$ jackknife estimates of $\theta$. \\
-Let $t_{jack} = \frac{1}{n}\sum_{i=1}^n t^{\ast}_i = \overline{t}^{\ast}$ (jackknife estimate of $\theta$)
-
-\section{Exercises}
-\subsection{Problem 1}
+\section{Problem 1}
 When $T = \overline{X}$, show that: 
 \subsubsection{$T = T_{jack}$ }
 If $T = \overline{X}$ then $t = \overline{X}$ and \\
@@ -178,10 +156,14 @@ sd0 = sd(survivalTimes)
 n = length(survivalTimes)
 @
 
-<<>>=
+<<plot1, fig.pos="h",fig.height=4, fig.width=4, fig.align='center'>>=
 library(ggplot2)
-qqnorm(survivalTimes)
-qqline(survivalTimes)
+df <- data.frame(survivalTimes)
+p1 <- ggplot(df, aes(sample=survivalTimes)) +
+    stat_qq( )+
+    stat_qq_line()
+    xlim(-2,2)
+plot(p1)
 
 shapiro.test(survivalTimes)$p.value
 @
@@ -211,7 +193,7 @@ The exact p.value is greater than the p.value of the boostrap yet there are no s
 
 \subsubsection{(b) Compute the $90\%$ bootstrap pivotal and percentile confidence intervals for $\mu$. Plot the histogram of the $B$ bootstrap estimates of $\mu$. Which CI do you think is more adequate?}
 
-<<>>=
+<<plot2, fig.pos="h",fig.height=4, fig.width=4, fig.align='center'>>=
 set.seed(777)
 alpha = 0.1
 t.star = numeric(B)
@@ -230,7 +212,7 @@ ci.boot
 
 library(ggplot2)
 p1 <- ggplot(data.frame(bootstrap = t.star), aes(x = bootstrap)) +
-      geom_histogram(aes(y = after_stat(density)))
+      geom_histogram(aes(y = after_stat(density)), binwidth= 30)
 plot(p1)
 
 ## percentile 90% CI
@@ -294,6 +276,11 @@ boot.mean <- boot(data=as.data.frame(survivalTimes),statistic = boot.T,R=B)
 boot.ci(boot.mean,type=c("basic","norm","perc", "bca"), conf=0.9) #TODO usar o mesmo bootstrap sample em vez de criar um novo (perguntar à professora)
 @ 
 
+\subsection {This car assembly factory needs that all these components are replaced after 1100 hours of service. Let
+  \begin{center}
+    T = number of survival hours of a component.
+  \end{center} 
+ One is interested in estimating the proportion of components that live more than 1100 hours, i.e., one wishes to estimate $p =P (T > 1100)$. It is known that $X$ = number of components that live more than 1100 hours in n inspected components, where $p = P (T > 1100)$ is the probability of a success, has distribution $\sim Bin(n, p)$}
 
 \subsubsection{(e) Show that $\mathcal{P} = \frac{X}{n}$ is an unbiased and consistent estimator of p. Estimate p and SE(P).}
 \begin{center}
@@ -400,8 +387,6 @@ It is normally less computational itensive than the bootstrap method. like the b
 
 Jackknife only works well for functoins with small changes in the statistic therefore it works well with, for example, linear statistics. May that not be the  case, it might fail to estimate the variance successfully. Compared to the boostrap, jackknife is only a crude approximation and therefore, if a more accurate value is desired, bootstrap confidence intervals are a better choice.
 
-\subsection{(g) The jackknife-after-bootstrap technique provides a way of measuring the uncertainty associated with the bootstrap estimate $\widehat{SE}(T)$ ($T$ some estimator of interest). Use this technique in order to estimate the standard error of the bootstrap estimate of $SE(P)$ obtained in (d).}
-
 <<>>=
 ### bootstrap
 set.seed(777)
@@ -430,6 +415,7 @@ t.star.jack.var = mean((t.star.jack - t.star.jack.mean)^2) * (n-1); t.star.jack.
 t.star.jack.sd = sqrt(t.star.jack.var); t.star.jack.sd;
 @ 
 
+\subsubsection{(g) The jackknife-after-bootstrap technique provides a way of measuring the uncertainty associated with the bootstrap estimate $\widehat{SE}(T)$ ($T$ some estimator of interest). Use this technique in order to estimate the standard error of the bootstrap estimate of $SE(P)$ obtained in (d).}
 
 \textbf{jackknife-after-bootstrap} \\
 
@@ -441,6 +427,7 @@ Here is the algorithm for the calculating the variance statistic, after drawing 
 \item For $i = 1,2, ..., n$, leave out the data in index i. call the result $\widehat{SE}_{B(i)}$
 \item define  \[\widehat{var}_{jack}(\widehat{se}_B) = (n-1) \frac{\sum_{1}^{n}(\widehat{se}_{B(i)} - \widehat{se}_{B(.)})^2}{n},\] where $\widehat{se}_{B(.)} = \sum_{i=1}^{n} \widehat{se}_{B(i)}/n$ (the mean of the boostrap standard error).
 \end{itemize}
+
 <<>>=
 set.seed(777)
 B= 10000
@@ -457,6 +444,336 @@ for(i in 1:B){
 t.star.jack.var = mean((t.star.jack - mean(t.star.jack))^2) * (n-1); t.star.jack.var
 t.star.jack.sd = sqrt(t.star.jack.var); t.star.jack.sd;
 @
+
+\subsection{1.3 Consider the following data
+$$
+\begin{array}{lllllllllllllll}
+\mathrm{x} & 0.3400 & 0.2800 & 0.3100 & 0.2800 & 0.300 & 0.270 & 0.320 & 0.250 & 0.34 & 0.3400 & 0.290 & \\ 0.2600 & 0.24 & 0.3300 \\
+\mathrm{y} & 0.2344 & 0.0795 & 0.1704 & 0.0957 & 0.169 & 0.093 & 0.162 & 0.032 & 0.24 & 0.1902 & 0.112 & \\ 0.0732 & 0.03 & 0.1863 \\
+\end{array}
+$$}
+
+\subsubsection{
+(a) Graphically inspect that there is a linear trend in the data. Comment on the linear trend. Fit a linear regression model to your data in $\mathrm{R}$ presenting and commenting in detail all the summary results referring to the fitted model (returned by the $\mathrm{R}$ function summary()). In addition plot the data \textit{versus} the fitted line; and use the R built-in function confint() and report a $90 \%$ CI for the slope parameter.}
+
+
+\subsubsection{
+  (b) Carefully check for the linear model's underlying assumptions - use both visual inspection and adequate statistical tests (at the $5 \%$ level) to check the assumptions. Does the fitted model validate all the underlying assumptions?
+}
+
+
+\subsubsection{(c) Use the \textbf{bootstrap of the pairs} (with $B=10000$ ) to: estimate the bias and standard error of the slope parameter estimator; check if there's need to correct the original estimate and if so report the corrected estimate; construct a pivotal $90 \%$ CI for the slope parameter; compare it with the CI obtained in (a).
+}
+
+
+
+
+\section{Problem 2 - Optimization}
+
+Let $X \sim \operatorname{Pareto}(1, \alpha)$, which has p.d.f.
+$$
+f(x ; \alpha)=\frac{\alpha}{x^{\alpha+1}}, \quad \alpha>0, \quad x \geq 1 .
+$$
+Let
+
+$\begin{array}{lllllllll}1.977866 & 1.836622 & 1.097168 & 1.232889 & 1.229526 & 2.438342 & 1.551389 & 1.300618 & 1.068584 \\ 1.183466 & 2.179033 & 1.535904 & 1.323500 & 1.458713 & 1.013755 & 3.602314 & 1.087067 & 1.014013 \\ 1.613929 & 2.792161 & 1.197081 & 1.021430 & 1.111531 & 1.131036 & 1.064926 & & \end{array}$ \\ \\
+be an observed sample from $X$.
+
+\subsection{2.1 Derive the likelihood, log-likelihood and score functions (simplify the expressions as much as possible). Derive both the \textbf{maximum likelihood estimator}  (MLE) and \textbf{method of moments estimator} (MME) of $\alpha$ and use them to estimate $\alpha$. Why are ML estimators so attractive? Briefly describe the properties of MLEs.}
+
+<<>>=
+    os = c(1.977866, 1.836622, 1.097168, 1.232889, 1.229526, 2.438342, 1.551389, 1.300618, 1.068584,
+                1.183466, 2.179033, 1.535904, 1.323500, 1.458713, 1.013755, 3.602314, 1.087067, 1.014013,
+                1.613929, 2.792161, 1.197081, 1.021430, 1.111531, 1.131036, 1.064926)
+    
+    n = length(os)
+    
+    #MLE
+    MLE = function(x) {n/sum(log(x))}
+    
+    MLE.v = MLE(os)
+    
+    MLE.v
+    
+    #MME
+    MME = function(x){mean(x)/(mean(x)-1)}
+    
+    MME.v = MME(os)
+    
+    MME.v
+@
+
+The principle of maximum likelihood provides a unified approach to estimating parameters of the distribution given sample data. Although ML estimators $\hat{\theta}_n$ are not in general unbiased, they possess a number of desirable asymptotic properties:\\
+\begin{itemize}
+\item consistency: $\hat{\theta}_n \stackrel{n \rightarrow \infty}{\rightarrow} \theta$\\
+\item normality: $\hat{\theta}_n \sim \mathcal{N}(\theta, \Sigma)$, where $\Sigma^{-1}$ is the Fisher information matrix.\\
+\item efficiency: $\operatorname{Var}\left(\hat{\theta}_n\right)$ approaches Cramer-Rao lower bound.
+\end{itemize}
+
+\subsection{2.2 Noting that the Pareto distribution belongs to the exponential family, derive the \textbf{Fisher information} $I_n(\alpha)$. Use the Fisher information to estimate the variance of the MLE.\\
+Assume herein that it was not possible to derive the MLE of $\alpha$ and as such, it was not possible to compute the ML estimate of $\alpha$.}
+
+<<>>=
+    In = n/(MLE.v^2)
+    MLE.var = 1/In
+    
+    MLE.var
+@ 
+
+\subsection{2.3 Display graphically (side-by-side) the likelihood, log-likelihood and score functions in order to locate the ML estimate of $\alpha$. Indicate an interval that contains the ML estimate.}
+
+<<plot3, fig.pos="h",fig.height=4, fig.width=4, fig.align='center'>>=
+   #Likelihood function
+    likh = function(theta){
+      l = vector()
+      for(t in theta)
+        l = c(l, (t^n)*prod(1/(os^(t+1))))
+      return(l)
+    }
+    
+    #Log-Likelihood function
+    loglikh = function(theta){
+      ll = vector()
+      for(t in theta)
+        ll = c(ll, n*log(t)-((t + 1) * sum(log(os))))
+      return(ll)
+    }
+    
+    #Score function
+    scr = function(theta) {
+      s = vector()
+      for(t in theta)
+        s = c(s, (n/t) - sum(log(os)))
+      return(s)
+    }
+    
+    #Graphical Display
+    library(ggplot2)
+    base <-
+      ggplot() +
+      xlim(0, 4)
+    
+    base + xlab(expression(theta)) + ylab("likelihood") + geom_function(fun = likh)
+    
+    base + xlab(expression(theta)) + ylab("log-likelihood") + geom_function(fun = loglikh)
+    
+    base + xlab(expression(theta)) + ylab("score") + geom_function(fun = scr)
+    
+    
+    #If we use interval estimation (2,4):
+    
+    #Likelihood function maximum
+    optimize(likh,c(2,4),maximum=T)$maximum
+    
+    #Log-Likelihood function maximum
+    optimize(loglikh,c(2,4),maximum=T)$maximum
+    
+    #Score function root
+    uniroot(scr,c(2,4))$root
+@ 
+
+\subsection{2.4 Use the R function maxLik() from library maxLik to approximate the ML estimate of $\alpha$. Feed $\operatorname{maxLik()}$ with the initial estimate of $\alpha$ given by the method of moments.}
+
+<<>>=
+    library(maxLik)
+    maxLik(loglikh,start=2.81418)
+    # Maximum Likelihood estimation
+    # Newton-Raphson maximisation, 1 iterations
+    # Return code 1: gradient close to zero (gradtol)
+    # Log-Likelihood: -8.016816 (1 free parameter(s))
+    # Estimate(s): 2.814179
+    
+    #The ML estimate of alpha by R function maxLik() was 2.814179.
+@ 
+
+\subsection{2.5 Implement the methods of \textbf{bissection}, \textbf{Newton-Raphson} and \textbf{secant} in $\mathrm{R}$ and use them to estimate $\alpha$. Report all the iterations computed by the different methods plus the corresponding errors. Justify your choice of the initial estimates for each method and discuss the results.}
+
+\textbf{Method of the Secant}\\
+The method of the secant (or secant method) is a root-finding algorithm that uses a succession of roots of secant lines to better approximate a root of a function $f$. The secant method can be thought of as a finite-difference approximation of Newton's method.\\ \\
+Although Newton's method is fast, it is required to know the derivative of $f$ in order to use it. In most realistic applications (real-life problems), this can be an impediment for the usage of this method, as the functional form of the derivative is, in many times, not known. A natural way to get around this problem would be to estimate the derivative using
+$$
+f^{\prime}(x) \approx \frac{f(x+\epsilon)-f(x)}{\epsilon}, \text { for } \epsilon \ll 1\text {.}
+$$
+The secant method uses the previous iteration to do something similar. It approximates the derivative using the previous approximation. As a result it converges a little slower than Newton's method to the solution:
+$$
+x_{n+1}=x_n-f\left(x_n\right) \frac{x_n-x_{n-1}}{f\left(x_n\right)-f\left(x_{n-1}\right)} \text {.}
+$$\\
+The iterates $x_n$ of the secant method converge to a root of $f$ is, if the initial values $x_0$ and $x_1$ are sufficiently close to the root. The order of convergence is $\varphi$ (where
+$
+\varphi=\frac{1+\sqrt{5}}{2} \approx 1.618
+$
+is the golden ratio). In this case, the secant method's convergence is superlinear (grows faster than any linear one), but not quadratic, as Newton's method.
+
+<<>>=
+  bisection <- function(a,b,eps){
+      # [a,b]: interval where s verifies Bolzano’s theorem
+      # eps : is the stopping rule
+      alpha.it = vector(); alpha.it[1] = (a+b)/2
+        k = 1; diff = 1
+        diffs= vector()
+        while(diff>eps){
+          #If multiplication is negative, reduce b
+          if(scr(alpha.it[k])*scr(a)<0){
+            b = alpha.it[k]
+            alpha.it[k+1] = (a+b)/2
+          }
+          #If multiplication is positive, raise a
+          else{if(scr(alpha.it[k])*scr(a)>0){
+            a = alpha.it[k]
+            alpha.it[k+1] = (a+b)/2
+            #If multiplication result is 0, we apply the stopping rule
+          }else{alpha.it[k+1]=alpha.it[k]}
+          }
+          #Update the iteration difference for the stopping rule
+          diff = abs(alpha.it[k+1]-alpha.it[k])
+          diffs[k]=diff
+          k = k+1
+        }
+        result = as.matrix(alpha.it)
+        colnames(result)<-"iterations"
+        rownames(result)<-1:length(alpha.it)
+        retList<-list("res"=result,"error"=diffs)
+        retList
+      }
+      #Bisection result for each iteration
+      l1=bisection(2,4,1e-06)
+      m1=t(l1$res)
+      m1
+      
+      #Error result for each iteration
+  l1$error
+
+@
+
+For the bisection method, we use the initial estimated interval $[2,4]$, as it requires a lower bound and a upper bound to start the convergence of the values until we get the closest estimation.
+
+<<>>=
+      #(Newton-Raphson aux function)
+      prime <- function(alpha){
+        out = numeric(length(alpha))
+        if(length(alpha)==1){out =- n/alpha^2}
+        if(length(alpha)!=1){
+          for(i in 1:length(alpha)){out[i] = - n/alpha[i]^2}
+        }
+        return(out)
+      }
+      
+    #Newton-Raphson algorithm to estimate alpha
+     NR <- function(x,alpha0,eps){
+       # x: observed sample
+       # alpha0: first value to iterate over the vector
+       # eps: the stopping rule
+       alpha.it = vector()
+       alpha.it[1] = alpha0
+       k = 1
+       diff = 1
+       diffs=vector()
+       #iterations
+       while(diff>eps){
+         alpha.it[k+1] = alpha.it[k]-scr(alpha.it[k])/prime(alpha.it[k])
+         diff = abs(alpha.it[k+1]-alpha.it[k])
+         diffs[k]=diff
+         k = k+1
+       }
+       result = as.matrix(alpha.it)
+       colnames(result)<-"iterations"
+       rownames(result)<-1:length(alpha.it)
+       result
+       retList<-list("res"=result,"error"=diffs)
+       retList
+     }
+     #NR result for each iteration
+     l2=NR(os,MLE.var,1e-06)
+     m2=t(l2$res)
+     m2
+      
+     #Error result for each iteration
+      l2$error
+@
+
+For the Newton-Raphson method, we use the \textit{MLE.var} initial value as \textit{$\alpha^0$}, as it is a reference value for the upper limit, until it converges to the closest estimation.
+
+<<>>=
+     #Secant algorithm to estimate alpha
+     secant <- function(x, alpha0, alpha1, eps) {
+       # x: observed sample
+       # alpha0: interval left limit
+       # alpha1: interval right limit
+       # eps: stopping rule value
+       alpha.it = vector()
+       alpha.it[1] = alpha0
+       32
+       alpha.it[2] = alpha1
+       k = 2
+       diff = 1
+       diffs = vector()
+       diffs[1] = diff
+       # iterations
+       while (diff > eps) {
+         alpha.it[k + 1] = alpha.it[k] - scr(alpha.it[k]) * 
+           ((alpha.it[k] - alpha.it[k-1])/(scr(alpha.it[k]) - scr(alpha.it[k - 1])))
+         diff = abs(alpha.it[k + 1] - alpha.it[k])
+         diffs[k] = diff
+         k = k + 1
+       }
+       result = as.matrix(alpha.it)
+       colnames(result) <- "iterations"
+       rownames(result) <- 1:length(alpha.it)
+       retList <- list(res = result, error = diffs)
+       retList
+     }
+     #Secant result for each iteration
+     l3 = secant(os, 2, 4, 1e-06)
+     m3 = t(l3$res)
+     m3
+     
+     #Error result for each iteration
+     l3$error
+@
+
+For the secant method, we use the initial estimated interval $[2,4]$, as it requires a lower bound and a upper bound to start the convergence of the values until we get the closest estimation.
+
+
+\subsection{2.6 Show, analytically, that the methods of \textbf{Newton-Raphson} and \textbf{Fisher scoring} coincide in this particular case.}
+
+<<>>=
+     #I(alpha)
+     Ialpha<-function(alpha){
+       n/(alpha^2)
+     }
+     #Fisher Scoring algorithm
+     fisherScoring <- function(x,alpha0,eps){
+       # x: observed sample
+       # alpha0: first value to iterate over the vector
+       # eps: the stopping rule
+       alpha.it = vector()
+       alpha.it[1] = alpha0
+       k = 1
+       diff = 1
+       diffs=vector()
+       diffs[1]=diff
+       # iterations
+       while(diff>eps){
+         alpha.it[k+1] = alpha.it[k]+(1/Ialpha(alpha.it[k]))*scr(alpha.it[k])
+         diff = abs(alpha.it[k+1]-alpha.it[k])
+         k = k+1
+         diffs[k]=diff
+       }
+       result = as.matrix(alpha.it)
+       colnames(result)<-"iterations"
+       rownames(result)<-1:length(alpha.it)
+       retList<-list("res"=result,"error"=diffs)
+       retList
+     }
+     #Fisher Scoring result for each iteration
+     l4=fisherScoring(os,MLE.var,0.000001)
+     m4=t(l4$res)
+     m4
+     
+     #Error result for each iteration
+     l4$error
+@ 
+
 
 \bibliographystyle{unsrt}
 \bibliography{bibs}

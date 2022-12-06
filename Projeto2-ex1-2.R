@@ -9,8 +9,13 @@ sd0 = sd(survivalTimes)
 n = length(survivalTimes)
 
 library(ggplot2)
-qqnorm(survivalTimes)
-qqline(survivalTimes)
+df <- data.frame(survivalTimes)
+p1 <- ggplot(df, aes(sample=survivalTimes)) +
+    stat_qq( )+
+    stat_qq_line()
+    xlim(-2,2)
+plot(p1)
+
 
 shapiro.test(survivalTimes)$p.value
 
@@ -31,8 +36,6 @@ for(i in 1:B){
 p.value <- sum(t.star>t.obs)/B; p.value
 
 ## The exact p.value is greater than the p.value of the boostrap yet there are no significant changes. Both the exact p.value and the bootstrap p.value are less than 0.05 therefore we reject the null hypothesis.
-
-
 
 ###(b)
 set.seed(777)
@@ -87,7 +90,7 @@ boot.T <- function(data,indices){
     return(mean(data[indices,]))
 }
 boot.mean <- boot(data=as.data.frame(survivalTimes),statistic = boot.T,R=B)
-boot.ci(boot.mean,type=c("basic","norm","perc", "bca"), conf=0.9) #TODO usar o mesmo bootstrap sample em vez de criar um novo (perguntar à professora)
+boot.ci(boot.mean,type=c("basic","norm","perc", "bca"), conf=0.9)
 
 ## (e)
 P.mean = mean(survivalTimes > 1100); P.mean
