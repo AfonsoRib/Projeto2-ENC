@@ -157,6 +157,17 @@ $S^2 = (\sqrt{\frac{\sum^n_{i=1}(x_i - \overline{X})^2}{n-1}})^2 = \frac{\sum^n_
 \end{tabular}
 \end{center}
 
+\subsubsection{(a) Let $\mu$ refer to the mean survival time of that component. Use the non-parametric bootstrap ($B = 10000$ samples) to test the hypotheses  
+  \begin{center}
+    \begin{tabular}{c c c}
+      $H0 : \mu \le 1020$ & vs & $H1 : \mu > 1020,$
+    \end{tabular}
+  \end{center} 
+at the usual nominal significance levels. Would it be possible to perform this test using
+an exact test? If so, do it and compare the results.}
+
+\subsubsection{(b) Compute the $90\%$ bootstrap pivotal and percentile confidence intervals for $\mu$. Plot the histogram of the $B$ bootstrap estimates of $\mu$. Which CI do you think is more adequate?}
+
 \subsubsection{(c) Compute the 90\% BCa bootstrap CI for $\mu$.}
 
 \textbf{Bias-Corrected-accelereated bootstrap confidence interval}
@@ -180,6 +191,9 @@ finally, having both $\hat{a}$ and $\hat{z}_0$ we can now calculate the adjusted
 \[ a_2 = \Phi \left( \hat{z}_0 + \frac{\hat{z}_0 + z^{(1-\alpha)}}{1-\hat{a}(\hat{z}_0 + z^{(1-\alpha)})}\right)\]
 
 where $\Phi$ the standard normal cumulative distribution function and $z^{(i)}$ the 100$\alpha$th percentile point of a standard normal  distribution.
+
+\subsubsection{(d) Use the boot.ci() function from the R boot package to compute all the above confidence intervals.}
+
 
 \subsubsection{(e) Show that $\mathcal{P} = \frac{X}{n}$ is an unbiased and consistent estimator of p. Estimate p and SE(P).}
 \begin{center}
@@ -211,7 +225,6 @@ since $E(\mathcal{P}) = p$ whe can afirm that $\mathcal{P}$ is an unbiased estim
 \[  \lim_{n\to\infty} V(\mathcal{P}) = \lim_{n\to\infty} V\left(\frac{X}{n}\right) = \lim_{n\to\infty} \frac{V(X)}{n^2}  = 0\]
 
 $\mathcal{P}$ is a consistent estimator since it's variance aproaches 0 as the sample size increases.
-
 
 \subsubsection{(f) Describe and discuss in detail the non-parametric bootstrap and jackknife techniques. Use both approaches (B = 10000 samples in the case of the bootstrap) to estimate the variance, standard error and bias of $\mathcal{P}$. Compare the results. Check whether there is need to correct the original estimate of p for bias and if such report the corrected estimate of p.}
 
