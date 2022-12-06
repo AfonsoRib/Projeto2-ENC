@@ -50,22 +50,18 @@
       return(s)
     }
     
-    #Graphical Display
+   #Graphical Display
     
-    par(mfrow=c(1,3))
-    theta <- seq(0.1,4.0,0.05)
+    library(ggplot2)
+    base <-
+      ggplot() +
+      xlim(0, 4)
     
-    plot(theta,likh(theta),ylab="likelihood",
-         xlab=expression(theta),lwd=2,type="l",cex.lab=1.5)
-    box(lwd=2)
+    base + xlab(expression(theta)) + ylab("likelihood") + geom_function(fun = likh)
     
-    plot(theta,loglikh(theta),ylab="log-likelihood",
-         xlab=expression(theta),lwd=2,type="l",cex.lab=1.5)
-    box(lwd=2)
+    base + xlab(expression(theta)) + ylab("log-likelihood") + geom_function(fun = loglikh)
     
-    plot(theta,scr(theta),ylab="score",
-         xlab=expression(theta),lwd=2,type="l",cex.lab=1.5)
-    abline(h=0,lty=3); box(lwd=2)
+    base + xlab(expression(theta)) + ylab("score") + geom_function(fun = scr)
     
     #If we use interval estimation (2,4):
     
