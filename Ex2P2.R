@@ -173,7 +173,7 @@
      
      #Secant algorithm to estimate alpha
      secant <- function(x, alpha0, alpha1, eps) {
-       # x: alpha0 samples: 
+       # x: observed sample
        # alpha0: interval left limit
        # alpha1: interval right limit
        # eps: stopping rule value
