@@ -14,7 +14,9 @@ qqline(survivalTimes)
 
 shapiro.test(survivalTimes)$p.value
 
-# Analysing the graphic and knowing that shapiro test p-value is greater than 0.05 we can affirm that the survival time estimates follow a normal Distribution.
+## Analysing the graphic and knowing that shapiro test p-value is greater than 0.05 we can affirm that the survival time estimates follow a normal Distribution.
+
+p.value.exact = 1-pnorm((mean(survivalTimes)-mu0)/(sd(survivalTimes)/sqrt(n))); p.value.exact
 
 set.seed(777)
 t.obs = (mean(survivalTimes)-mu0)/(sd0/sqrt(n))
@@ -27,6 +29,10 @@ for(i in 1:B){
 }
 # decision on H0 based on the p.value
 p.value <- sum(t.star>t.obs)/B; p.value
+
+## The exact p.value is greater than the p.value of the boostrap yet there are no significant changes. Both the exact p.value and the bootstrap p.value are less than 0.05 therefore we reject the null hypothesis.
+
+
 
 ###(b)
 set.seed(777)
@@ -45,6 +51,7 @@ ci.boot = t - c(d[2],d[1])
 names(ci.boot) <- c("5%", "95%")
 ci.boot
 
+## draw histogram
 library(ggplot2)
 p1 <- ggplot(data.frame(bootstrap = t.star), aes(x = bootstrap)) +
       geom_histogram(aes(y = after_stat(density)))
