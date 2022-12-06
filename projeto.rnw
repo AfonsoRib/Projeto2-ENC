@@ -157,6 +157,11 @@ $S^2 = (\sqrt{\frac{\sum^n_{i=1}(x_i - \overline{X})^2}{n-1}})^2 = \frac{\sum^n_
 \end{tabular}
 \end{center}
 
+<<>>=
+survivalTimes = c(1552, 627, 884, 2183, 1354, 1354, 1014, 2420,  71, 3725,
+	          2195, 2586, 1577, 1766, 1325, 1299, 159, 1825, 965, 695)
+@ 
+
 \subsubsection{(a) Let $\mu$ refer to the mean survival time of that component. Use the non-parametric bootstrap ($B = 10000$ samples) to test the hypotheses  
   \begin{center}
     \begin{tabular}{c c c}
@@ -166,7 +171,71 @@ $S^2 = (\sqrt{\frac{\sum^n_{i=1}(x_i - \overline{X})^2}{n-1}})^2 = \frac{\sum^n_
 at the usual nominal significance levels. Would it be possible to perform this test using
 an exact test? If so, do it and compare the results.}
 
+<<>>=
+B = 100000
+mu0 = 1020
+sd0 = sd(survivalTimes)
+n = length(survivalTimes)
+@
+
+<<>>=
+library(ggplot2)
+qqnorm(survivalTimes)
+qqline(survivalTimes)
+
+shapiro.test(survivalTimes)$p.value
+@
+
+Analysing the graphic and knowing that shapiro test p-value is greater than 0.05 we can affirm that the survival time estimates follow a normal Distribution. Does mean we can safely perfom an exact test:
+
+<<>>=
+p.value.exact = 1-pnorm((mean(survivalTimes)-mu0)/(sd(survivalTimes)/sqrt(n))); p.value.exact
+@ 
+
+<<>>=
+set.seed(777)
+t.obs = (mean(survivalTimes)-mu0)/(sd0/sqrt(n))
+t.star = numeric(B)
+z=survivalTimes-mean(survivalTimes)+mu0 
+for(i in 1:B){
+    z.star    = sample(z,n,replace=T)
+    sd.z.star = sd(z.star)
+    t.star[i] = (mean(z.star)-mu0)/(sd.z.star/sqrt(n))
+}
+
+## decision on H0 based on the p.value
+p.value <- sum(t.star>t.obs)/B; p.value
+@
+
+The exact p.value is greater than the p.value of the boostrap yet there are no significant changes. Both the exact p.value and the bootstrap p.value are less than 0.05 therefore we reject the null hypothesis.
+
 \subsubsection{(b) Compute the $90\%$ bootstrap pivotal and percentile confidence intervals for $\mu$. Plot the histogram of the $B$ bootstrap estimates of $\mu$. Which CI do you think is more adequate?}
+
+<<>>=
+set.seed(777)
+alpha = 0.1
+t.star = numeric(B)
+t= mean(survivalTimes)
+for(i in 1:B){
+    x.boot = sample(survivalTimes, length(survivalTimes), replace=T)
+    t.star[i] = mean(x.boot)
+}
+
+### pivotal CI (review)
+delta.star = t.star - t
+d = quantile(delta.star, c(alpha/2,1-alpha/2))
+ci.boot = t - c(d[2],d[1])
+names(ci.boot) <- c("5%", "95%")
+ci.boot
+
+library(ggplot2)
+p1 <- ggplot(data.frame(bootstrap = t.star), aes(x = bootstrap)) +
+      geom_histogram(aes(y = after_stat(density)))
+plot(p1)
+
+## percentile 90% CI
+d = quantile(t.star, c(alpha/2,1-alpha/2)); d
+@ 
 
 \subsubsection{(c) Compute the 90\% BCa bootstrap CI for $\mu$.}
 
@@ -192,7 +261,38 @@ finally, having both $\hat{a}$ and $\hat{z}_0$ we can now calculate the adjusted
 
 where $\Phi$ the standard normal cumulative distribution function and $z^{(i)}$ the 100$\alpha$th percentile point of a standard normal  distribution.
 
+<<>>=
+set.seed(777)
+u <- c(alpha/2, 1-alpha/2) #desired quantiles
+z <- qnorm(mean(t.star < t)) 
+z.u <- qnorm(u)
+
+## calculate accelaration using an estimator
+t.star.jack = numeric(length(survivalTimes))
+for(i in 1:length(survivalTimes)){
+    t.star.jack[i] = mean(survivalTimes[-i])
+}
+mean.t.star.jack <- mean(t.star.jack)
+a.hat <- sum((mean.t.star.jack - t.star.jack)^3)/(6*(sum((mean.t.star.jack - t.star.jack)^2))^(3/2))
+
+#Adjusted quantiles
+u_adjusted <- pnorm(z + (z+z.u)/(1-a.hat*(z+z.u))) 
+
+#Accelerated Bootstrap CI
+quantile(t.star, u_adjusted)
+@ 
+
 \subsubsection{(d) Use the boot.ci() function from the R boot package to compute all the above confidence intervals.}
+
+<<>>=
+set.seed(777)
+library(boot)
+boot.T <- function(data,indices){
+    return(mean(data[indices,]))
+}
+boot.mean <- boot(data=as.data.frame(survivalTimes),statistic = boot.T,R=B)
+boot.ci(boot.mean,type=c("basic","norm","perc", "bca"), conf=0.9) #TODO usar o mesmo bootstrap sample em vez de criar um novo (perguntar à professora)
+@ 
 
 
 \subsubsection{(e) Show that $\mathcal{P} = \frac{X}{n}$ is an unbiased and consistent estimator of p. Estimate p and SE(P).}
@@ -226,7 +326,12 @@ since $E(\mathcal{P}) = p$ whe can afirm that $\mathcal{P}$ is an unbiased estim
 
 $\mathcal{P}$ is a consistent estimator since it's variance aproaches 0 as the sample size increases.
 
+<<>>=
+P.mean = mean(survivalTimes > 1100); P.mean
+@ 
+
 \subsubsection{(f) Describe and discuss in detail the non-parametric bootstrap and jackknife techniques. Use both approaches (B = 10000 samples in the case of the bootstrap) to estimate the variance, standard error and bias of $\mathcal{P}$. Compare the results. Check whether there is need to correct the original estimate of p for bias and if such report the corrected estimate of p.}
+
 
 \textbf{non-parametric bootstraping} \\
 Bootstaping is any resampling method that that uses random sampling with replacement for a given sample. It is used to assess the accuracy of statistical estimates and tests and estimate statistics of the population.
@@ -297,6 +402,35 @@ Jackknife only works well for functoins with small changes in the statistic ther
 
 \subsection{(g) The jackknife-after-bootstrap technique provides a way of measuring the uncertainty associated with the bootstrap estimate $\widehat{SE}(T)$ ($T$ some estimator of interest). Use this technique in order to estimate the standard error of the bootstrap estimate of $SE(P)$ obtained in (d).}
 
+<<>>=
+### bootstrap
+set.seed(777)
+B= 10000
+t.star.boot=numeric(B)
+for(i in 1:B){
+    survivalTimes.sample = sample(survivalTimes,length(survivalTimes),replace =T)
+    t.star.boot[i] = mean(survivalTimes.sample > 1100)
+}
+
+t.star.boot.mean =mean(t.star.boot); t.star.boot.mean
+t.star.boot.bias = t.star.boot.mean - P.mean; t.star.boot.bias
+t.star.boot.var = var(t.star.boot); t.star.boot.var
+t.star.boot.sd = sqrt(t.star.boot.var); t.star.boot.sd
+
+### jackknife
+set.seed(777)
+t.star.jack=numeric(length(survivalTimes))
+for(i in 1:length(survivalTimes)){
+    t.star.jack[i] = mean(survivalTimes[-i] > 1100)
+}
+
+t.star.jack.mean = mean(t.star.jack); t.star.jack.mean
+t.star.jack.bias = (t.star.jack.mean - P.mean) * (n-1); t.star.jack.bias
+t.star.jack.var = mean((t.star.jack - t.star.jack.mean)^2) * (n-1); t.star.jack.var
+t.star.jack.sd = sqrt(t.star.jack.var); t.star.jack.sd;
+@ 
+
+
 \textbf{jackknife-after-bootstrap} \\
 
 Jackknife-after-boostrap is a method used to find the error estimate of a bootstrap estimate. It can be applied to any bootstrap statistic, not only standard error. After bootstrapping, we apply the jackknife to each of the newly generated samples. 
@@ -307,6 +441,22 @@ Here is the algorithm for the calculating the variance statistic, after drawing 
 \item For $i = 1,2, ..., n$, leave out the data in index i. call the result $\widehat{SE}_{B(i)}$
 \item define  \[\widehat{var}_{jack}(\widehat{se}_B) = (n-1) \frac{\sum_{1}^{n}(\widehat{se}_{B(i)} - \widehat{se}_{B(.)})^2}{n},\] where $\widehat{se}_{B(.)} = \sum_{i=1}^{n} \widehat{se}_{B(i)}/n$ (the mean of the boostrap standard error).
 \end{itemize}
+<<>>=
+set.seed(777)
+B= 10000
+t.star.boot=numeric(B)
+t.star.jack=numeric(length(survivalTimes))
+for(i in 1:B){
+    z.star = sample(survivalTimes,length(survivalTimes),replace =T)
+    t.star.boot[i] = mean(z.star > 1100)
+}
+for(i in 1:B){
+    t.star.jack[i] = sd(t.star.boot[-i])
+}
+
+t.star.jack.var = mean((t.star.jack - mean(t.star.jack))^2) * (n-1); t.star.jack.var
+t.star.jack.sd = sqrt(t.star.jack.var); t.star.jack.sd;
+@
 
 \bibliographystyle{unsrt}
 \bibliography{bibs}
