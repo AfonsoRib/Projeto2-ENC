@@ -8,6 +8,14 @@ mu0 = 1020
 sd0 = sd(survivalTimes)
 n = length(survivalTimes)
 
+library(ggplot2)
+qqnorm(survivalTimes)
+qqline(survivalTimes)
+
+shapiro.test(survivalTimes)$p.value
+
+# Analysing the graphic and knowing that shapiro test p-value is greater than 0.05 we can affirm that the survival time estimates follow a normal Distribution.
+
 set.seed(777)
 t.obs = (mean(survivalTimes)-mu0)/(sd0/sqrt(n))
 t.star = numeric(B)
